@@ -7,7 +7,7 @@ const Index = () => {
   const [courseCode, setCourseCode] = useState('');
   const [topics, setTopics] = useState('');
   const [exam, setExam] = useState('');
-  const [answers, setAnswers] = useState('');
+  const [answers, setAnswers] = useState({});
   const [feedback, setFeedback] = useState('');
   const [score, setScore] = useState(null);
   const toast = useToast();
@@ -16,6 +16,14 @@ const Index = () => {
     // Placeholder for OpenAI API call
     const generatedExam = `Generated exam for ${university} - ${courseCode} on topics: ${topics}`;
     setExam(generatedExam);
+    setAnswers({}); // Reset answers when a new exam is generated
+  };
+
+  const handleAnswerChange = (question, value) => {
+    setAnswers(prevAnswers => ({
+      ...prevAnswers,
+      [question]: value
+    }));
   };
 
   const submitAnswers = () => {
@@ -34,6 +42,28 @@ const Index = () => {
     });
   };
 
+  const renderQuestions = () => {
+    // Placeholder for dynamically generated questions
+    const questions = [
+      "Question 1: Explain the theory of relativity.",
+      "Question 2: Describe the process of photosynthesis.",
+      "Question 3: Solve the following equation: 2x + 3 = 7.",
+      "Question 4: Discuss the impact of climate change on polar bears."
+    ];
+
+    return questions.map((question, index) => (
+      <Box key={index} width="100%" p={4} borderWidth={1} borderRadius="md" mt={4}>
+        <Text fontSize="lg" fontWeight="bold">{question}</Text>
+        <Textarea
+          mt={2}
+          placeholder="Enter your answer here"
+          value={answers[question] || ''}
+          onChange={(e) => handleAnswerChange(question, e.target.value)}
+        />
+      </Box>
+    ));
+  };
+
   return (
     <Container centerContent maxW="container.md" py={10}>
       <VStack spacing={4} width="100%">
@@ -48,11 +78,9 @@ const Index = () => {
             <Text mt={2}>{exam}</Text>
           </Box>
         )}
+        {exam && renderQuestions()}
         {exam && (
-          <>
-            <Textarea placeholder="Enter your answers here" value={answers} onChange={(e) => setAnswers(e.target.value)} />
-            <Button colorScheme="blue" onClick={submitAnswers}>Submit Answers</Button>
-          </>
+          <Button colorScheme="blue" onClick={submitAnswers}>Submit Answers</Button>
         )}
         {feedback && (
           <Box width="100%" p={4} borderWidth={1} borderRadius="md">
